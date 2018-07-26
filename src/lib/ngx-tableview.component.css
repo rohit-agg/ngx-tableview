@@ -1,0 +1,9 @@
+.dropdown-menu {
+  padding: 0.5rem;
+}
+
+.dropdown-menu .dropdown-list {
+  max-height: 150px;
+  overflow: auto;
+  overflow-x: hidden;
+}

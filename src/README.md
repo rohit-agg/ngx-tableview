@@ -2,7 +2,3 @@
 
 ## Configuration
 
-|key|value|
-|---|---|
-|table||
-|columns||
