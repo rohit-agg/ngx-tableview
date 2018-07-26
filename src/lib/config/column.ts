@@ -14,7 +14,7 @@ export class Column {
     this.title = column.title;
     this.class = column.class ? column.class : '';
     this.default = column.default !== undefined ? column.default : false;
-    this.filter = new Filter();
+    this.filter = column.filter ? new Filter(column.filter) : null;
   }
 
   isDefault() {

@@ -3,7 +3,30 @@
 }
 
 .dropdown-menu .dropdown-list {
-  max-height: 150px;
+  max-height: 50rem;
+  min-width: 10rem;
   overflow: auto;
-  overflow-x: hidden;
+}
+
+.input-group .input-group-prepend .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-group .input-group-append .form-control {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.ngx-table-container {
+  overflow: auto;
+  min-height: 30rem;
+}
+
+.ngx-table-container table th {
+  min-width: 10rem;
+}
+
+ul.pagination {
+  margin-bottom: 0;
 }

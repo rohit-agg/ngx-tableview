@@ -25,15 +25,23 @@ export class TableConfig {
     this.options = new TableOptions(config.options);
 
     this.columns = new Array<Column>();
-    this.projection = [];
+    this.filters = new Array<Filter>();
+    this.projection = config.projection ? config.projection : [];
+    this.pagination = new Pagination(config.pagination);
 
     config.columns.forEach(function (column) {
 
       const ngxColumn = new Column(column);
       self.columns.push(ngxColumn);
-      if (ngxColumn.default === true) {
+      if (ngxColumn.default === true && self.projection.indexOf(column.id) === -1) {
         self.projection.push(column.id);
       }
+    });
+
+    config.filters.forEach(function (filter) {
+
+      const ngxFilter = new Filter(filter);
+      self.filters.push(ngxFilter);
     });
   }
 
@@ -41,7 +49,7 @@ export class TableConfig {
     return this.title || this.options.headerEnabled() || this.filters;
   }
 
-  projected(column) {
+  isProjected(column) {
     return this.projection.indexOf(column) !== -1;
   }
 
@@ -52,5 +60,13 @@ export class TableConfig {
     } else {
       this.projection.push(column);
     }
+  }
+
+  projectedColumns(): Array<Column> {
+
+    const self = this;
+    return this.columns.filter(function (column) {
+      return self.projection.indexOf(column.id) !== -1;
+    });
   }
 }

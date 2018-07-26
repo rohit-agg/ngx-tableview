@@ -23,15 +23,15 @@
               <div class="col-12">
 
                 <div role="menuitem">
-                  <input type="text" class="form-control" placeholder="Search Columns..." [(ngModel)]="searchText" />
+                  <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchText" />
                 </div>
                 <hr class="divider" />
 
                 <ul class="list-unstyled dropdown-list" role="menuitem">
 
                   <li *ngFor="let column of table.columns | columnFilter: searchText" role="menuitemcheckbox">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" [disabled]="column.isDefault()" [checked]="table.projected(column.id)" (click)="table.project(column.id)">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" [disabled]="column.isDefault()" [checked]="table.isProjected(column.id)" (change)="table.project(column.id)">
                       <label class="form-check-label">
                         {{column.title}}
                       </label>
@@ -47,7 +47,7 @@
 
         </div>
 
-        <button type="button" *ngIf="table.options.filters" class="btn btn-outline-dark" (click)="filtersCollapsed = !filtersCollapsed" [attr.aria-expanded]="!filtersCollapsed" aria-controls="filtersCollapse">
+        <button type="button" *ngIf="table.filters" class="btn btn-outline-dark" (click)="filtersCollapsed = !filtersCollapsed" [attr.aria-expanded]="!filtersCollapsed" aria-controls="filtersCollapse">
           <i class="fa fa-filter"></i> Filter
         </button>
 
@@ -59,27 +59,13 @@
   <div class="row">
     <div class="col-12">
 
-      <!-- <div *ngIf="table.projection" class="card card-block card-header" [collapse]="projectionCollapsed" id="projectionCollapse">
-
-        <div class="row">
-          <ng-template ngFor let-column [ngForOf]="columns">
-            <div class="col-2">
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="projection-{{column.id}}" [value]="column.id" [checked]="table.columns.indexOf(column.id) !== -1"
-                  [disabled]="column.default" (change)="toggleColumn(column.id)">
-                <label class="form-check-label" for="projection-{{column.id}}">{{column.title}}</label>
-              </div>
-            </div>
-          </ng-template>
-        </div>
-
-      </div> -->
-
       <div *ngIf="table.filters" class="card card-block card-header" [collapse]="filtersCollapsed" id="filtersCollapse">
 
         <div class="row">
           <div class="col-3" *ngFor="let filter of table.filters">
-            <ngx-tableview-filter [filter]="filter"></ngx-tableview-filter>
+            <div class="form-group">
+              <ngx-tableview-filter [filter]="filter"></ngx-tableview-filter>
+            </div>
           </div>
         </div>
 
@@ -90,48 +76,59 @@
 
   <div class="row">
     <div class="col-12">
-      <table [ngClass]="['table', table.class]">
-        <thead>
-          <tr>
-            <ng-template ngFor let-column [ngForOf]="getColumns()">
-              <th>{{column.title}}</th>
-            </ng-template>
-          </tr>
-          <tr>
-            <ng-template ngFor let-column [ngForOf]="getColumns()">
-              <th>
-                <div *ngIf="column.filter">
-                  <ngx-tableview-filter [filter]="column.filter"></ngx-tableview-filter>
-                </div>
-              </th>
-            </ng-template>
-          </tr>
-        </thead>
-        <tbody>
-          <ng-template ngFor let-row [ngForOf]="data">
+      <div class="ngx-table-container">
+
+        <table [ngClass]="['table', table.class]">
+          <thead>
             <tr>
-              <ng-template ngFor let-column [ngForOf]="getColumns()">
-                <td>{{row[column.id]}}</td>
+              <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
+                <th>{{column.title}}</th>
               </ng-template>
             </tr>
-          </ng-template>
-        </tbody>
-      </table>
+            <tr>
+              <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
+                <th>
+                  <div *ngIf="column.filter">
+                    <ngx-tableview-filter [filter]="column.filter"></ngx-tableview-filter>
+                  </div>
+                </th>
+              </ng-template>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-template *ngIf="!loading" ngFor let-row [ngForOf]="data">
+              <tr>
+                <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
+                  <td>{{row[column.id]}}</td>
+                </ng-template>
+              </tr>
+            </ng-template>
+            <tr *ngIf="loading">
+              <td [colSpan]="table.projectedColumns().length">
+                <h2 class="text-center m-5">Loading...</h2>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
+      </div>
     </div>
   </div>
 
-  <div *ngIf="table.pagination" class="row">
+  <div *ngIf="table.options.pagination && table.pagination.total !== -1 && !loading" class="row">
 
     <div class="col-4 text-left">
-      <label class="my-1">Records {{pagination.start_record}} - {{pagination.end_record}} of {{pagination.total_records}}</label>
+      <label class="my-1">Record(s) {{table.pagination.start}} - {{table.pagination.end}} of {{table.pagination.total}}</label>
     </div>
 
-    <div class="col-4 form-inline justify-content-center">
-      <select class="form-control">
-        <option *ngFor="let record of pagination.records" [value]="record">{{record}}</option>
-      </select>
-      <label class="my-1 ml-2"> record(s) per page</label>
+    <div class="col-4">
+      <div class="form-inline justify-content-center">
+
+        <select class="form-control">
+          <option *ngFor="let record of table.pagination.records" [value]="record">{{record}}</option>
+        </select>
+        <label class="my-1 ml-2"> record(s) per page</label>
+      </div>
     </div>
 
     <div class="col-4 pull-right">

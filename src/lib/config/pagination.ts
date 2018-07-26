@@ -1,8 +1,19 @@
 export class Pagination {
 
-  start: Number;
-  end: Number;
-  total: Number;
+  start: number;
+  end: number;
+  count: number;
+  total: number;
 
-  filter: Array<Number>;
+  records: Array<number>;
+
+  constructor(pagination) {
+
+    this.start = 1;
+    this.end = -1;
+    this.total = -1;
+
+    this.records = pagination.records;
+    this.count = this.records[0];
+  }
 }

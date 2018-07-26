@@ -1,131 +1,46 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
 import { TableConfig } from './config/table-config';
 
 @Component({
   selector: 'ngx-tableview',
   templateUrl: 'ngx-tableview.component.html',
   styleUrls: [
-    'ngx-tableview.component.css'
-  ]
+    'ngx-tableview.component.css',
+    '../../../../node_modules/ngx-bootstrap/datepicker/bs-datepicker.css'
+  ],
+  encapsulation: ViewEncapsulation.None
 })
 export class NgxTableviewComponent implements OnInit {
   @Input() config;
-
-  projectionCollapsed: Boolean = true;
-  filtersCollapsed: Boolean = true;
+  @Input() callback: Function;
 
   table: TableConfig;
+  data: any;
 
-  data: Object;
+  filtersCollapsed: Boolean = true;
+  loading: Boolean = false;
 
   ngOnInit() {
 
     this.table = new TableConfig(this.config);
+    this.data = [];
 
-    if (this.table.filters) {
-
-      // this.table.filters.forEach((filter, index) => {
-
-      //   if (filter.type === 'select') {
-      //     this.table.filters[index].items = this.prepareDropdownItems(filter.items);
-      //   }
-      //   if (filter.operation) {
-      //     this.table.filters[index].operation = this.prepareDropdownItems(filter.operation);
-      //   }
-      // });
-    }
-
-    // if (this.table.pagination) {
-    //   this.pagination = this.config.pagination;
-    // }
-
-    if (this.config.data) {
-      this.data = this.config.data;
-    }
-
-    // let tableColumns = [];
-    // this.config.columns.forEach(column => {
-
-    //   column = Object.assign({
-    //     id: '',
-    //     class: '',
-    //     title: '',
-    //     defaut: false
-    //   }, column);
-
-    //   if (column.filter) {
-
-    //     if (column.filter.type === 'select') {
-    //       column.filter.items = this.prepareDropdownItems(column.filter.items);
-    //     }
-
-    //     if (column.filter.operation) {
-    //       column.filter.operation = this.prepareDropdownItems(column.filter.operation);
-    //     }
-    //   }
-
-    //   this.columns.push(column);
-    //   tableColumns.push(column.id);
-    // });
-
-    // if (this.table.columns.length === 0) {
-    //   this.table.columns = tableColumns;
-    // }
+    this.getData();
   }
 
-  private prepareDropdownItems = function (items) {
+  getData() {
 
-    const preparedItems = [
-      {
-        value: '',
-        text: '(Select)'
-      }
-    ];
+    const self = this;
+    this.loading = true;
 
-    for (const key in items) {
+    let filters = {};
 
-      if (isNaN(parseInt(key))) {
+    this.callback(filters).then(function ([data, count]) {
 
-        preparedItems.push({
-          value: key,
-          text: items[key]
-        });
-
-      } else {
-
-        preparedItems.push({
-          value: items[key],
-          text: items[key]
-        });
-      }
-    }
-
-    return preparedItems;
-  };
-
-  getColumns() {
-
-    const columns = [],
-      self = this;
-    // this.columns.forEach(function (column) {
-    //   if (self.table.columns.indexOf(column.id) !== -1) {
-    //     columns.push(column);
-    //   }
-    // });
-    return columns;
-  }
-
-  preventClose(event: MouseEvent) {
-    event.stopImmediatePropagation();
-  }
-
-  toggleColumn(column) {
-
-    // let index = this.table.columns.indexOf(column);
-    // if (index === -1) {
-    //   this.table.columns.push(column);
-    // } else {
-    //   this.table.columns.splice(index, 1);
-    // }
+      self.data = data;
+      self.table.pagination.total = count;
+      self.table.pagination.end = self.table.pagination.start + data.length - 1;
+      self.loading = false;
+    });
   }
 }
