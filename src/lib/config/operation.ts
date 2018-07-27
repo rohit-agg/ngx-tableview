@@ -1,11 +1,11 @@
 export class Operation {
 
-  value: string;
-  text: string;
+  id: string;
+  title: string;
 
-  constructor(value, text) {
+  constructor(id, title) {
 
-    this.value = value;
-    this.text = text;
+    this.id = id;
+    this.title = title;
   }
 }

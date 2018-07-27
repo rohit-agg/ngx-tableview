@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
 import { TableConfig } from './config/table-config';
+import { FilterValue } from './config/filter-value';
 
 @Component({
   selector: 'ngx-tableview',
@@ -17,6 +18,7 @@ export class NgxTableviewComponent implements OnInit {
   table: TableConfig;
   data: any;
 
+  filters: Array<FilterValue>;
   filtersCollapsed: Boolean = true;
   loading: Boolean = false;
 
@@ -25,7 +27,25 @@ export class NgxTableviewComponent implements OnInit {
     this.table = new TableConfig(this.config);
     this.data = [];
 
+    this.__prepareDefaultFilters();
+
     this.getData();
+  }
+
+  private __prepareDefaultFilters() {
+
+    this.filters = this.table.filters.map(function (filter) {
+
+      if (filter.default === true) {
+
+        const filterValue = new FilterValue();
+        filterValue.id = filter.id;
+        return filterValue;
+      }
+
+    }).filter(function (value) {
+      return value;
+    });
   }
 
   getData() {
@@ -33,9 +53,7 @@ export class NgxTableviewComponent implements OnInit {
     const self = this;
     this.loading = true;
 
-    let filters = {};
-
-    this.callback(filters).then(function ([data, count]) {
+    this.callback().then(function ([data, count]) {
 
       self.data = data;
       self.table.pagination.total = count;

@@ -56,22 +56,44 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-12">
+  <div *ngIf="table.filters" class="card card-block card-header" [collapse]="filtersCollapsed" id="filtersCollapse">
 
-      <div *ngIf="table.filters" class="card card-block card-header" [collapse]="filtersCollapsed" id="filtersCollapse">
-
-        <div class="row">
-          <div class="col-3" *ngFor="let filter of table.filters">
-            <div class="form-group">
-              <ngx-tableview-filter [filter]="filter"></ngx-tableview-filter>
-            </div>
-          </div>
+    <div class="row">
+      <div class="col-3" *ngFor="let filter of filters">
+        <div class="form-group">
+          <ngx-tableview-filter [filters]="table.filters" [(ngModel)]="filter"></ngx-tableview-filter>
         </div>
+      </div>
+    </div>
 
+    <div class="row">
+      <div class="col-12">
+        <hr />
+      </div>
+    </div>
+
+    <div class="row">
+
+      <div class="col-3">
+        <button type="button" class="btn btn-primary">Add Filter</button>
+      </div>
+
+      <div class="col-9 float-right text-right">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="match-criteria" value="all" checked> Match all
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="match-criteria" value="any"> Match any
+          </label>
+        </div>
+        <button type="button" class="btn btn-primary">Apply Filters</button>
       </div>
 
     </div>
+
   </div>
 
   <div class="row">
@@ -83,15 +105,6 @@
             <tr>
               <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
                 <th>{{column.title}}</th>
-              </ng-template>
-            </tr>
-            <tr>
-              <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
-                <th>
-                  <div *ngIf="column.filter">
-                    <ngx-tableview-filter [filter]="column.filter"></ngx-tableview-filter>
-                  </div>
-                </th>
               </ng-template>
             </tr>
           </thead>
@@ -137,4 +150,3 @@
   </div>
 
 </div>
-
