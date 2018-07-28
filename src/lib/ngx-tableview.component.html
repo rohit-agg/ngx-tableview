@@ -1,0 +1,316 @@
+<div class="container-fluid mb-5">
+
+  <div class="row" *ngIf="table.showHeader()">
+    <div class="col-12">
+
+      <h4 *ngIf="table.title" class="pull-left">{{table.title}}</h4>
+
+      <div class="btn-group pull-right" role="group">
+
+        <button type="button" *ngIf="table.options.refresh" class="btn btn-outline-dark" [disabled]="loading" (click)="getData()">
+          <i class="fa fa-refresh"></i> Refresh
+        </button>
+
+        <div class="btn-group" dropdown [autoClose]="false">
+
+          <button id="ngx-project-btn" type="button" *ngIf="table.options.projection" class="btn btn-outline-dark" dropdownToggle aria-controls="ngx-project-dropdown">
+            <i class="fa fa-bars"></i> Projection
+          </button>
+
+          <div *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu" id="ngx-project-dropdown" aria-labelledby="ngx-project-btn">
+
+            <div class="row">
+              <div class="col-12">
+
+                <div role="menuitem">
+                  <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchText" />
+                </div>
+
+                <div role="menuitem" class="mt-1 mb-1">
+                  <button type="button" class="btn btn-link p-0" (click)="showAll()">Show All</button>
+                  <label class="m-0">&nbsp;|&nbsp;</label>
+                  <button type="button" class="btn btn-link p-0" (click)="hideAll()">Hide All</button>
+                </div>
+
+                <hr class="divider mt-0 mb-2" />
+
+                <ul class="list-unstyled dropdown-list" role="menuitem">
+
+                  <li *ngFor="let column of table.columns | columnFilter: searchText" role="menuitemcheckbox">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" [disabled]="column.isDefault()" [checked]="table.isProjected(column.id)" (change)="table.project(column.id)">
+                      <label class="form-check-label">
+                        {{column.title}}
+                      </label>
+                    </div>
+                  </li>
+
+                </ul>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <button type="button" *ngIf="table.filters.size > 0" class="btn btn-outline-dark" (click)="filtersCollapsed = !filtersCollapsed" [attr.aria-expanded]="!filtersCollapsed" aria-controls="filtersCollapse">
+          <i class="fa fa-filter"></i> Filter
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="table.filters.size > 0" class="card card-block card-header" [collapse]="filtersCollapsed" id="filtersCollapse">
+
+    <div class="row">
+      <div class="col-4" *ngFor="let item of request.filters; index as i">
+
+        <div class="form-group">
+          <div class="row">
+
+            <div class="col-4">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <button class="btn" type="button" (click)="removeFilter(i)">
+                    <i class="fa fa-minus"></i>
+                  </button>
+                </div>
+                <select class="form-control" [(ngModel)]="item.id" placeholder="(Select...)">
+                  <option *ngFor="let filter of table.filters | toArray" [value]="filter.id">{{filter.title}}</option>
+                </select>
+              </div>
+
+            </div>
+
+            <div class="col-8" *ngIf="table.filters.get(item.id); let filter" [ngSwitch]="filter.type">
+
+              <div *ngSwitchCase="'text'">
+
+                <div *ngIf="filter.operation.length == 0">
+
+                  <input *ngIf="!filter.range" type="text" class="form-control" [(ngModel)]="item.value" />
+
+                  <div *ngIf="filter.range" class="input-group">
+                    <input type="text" class="form-control" [(ngModel)]="item.from" />
+                    <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
+                    <input type="text" class="form-control" [(ngModel)]="item.to" />
+                  </div>
+
+                </div>
+
+                <div *ngIf="filter.operation.length > 0" class="input-group">
+
+                  <div class="input-group-prepend">
+                    <select class="form-control" [(ngModel)]="item.operation">
+                      <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
+                    </select>
+                  </div>
+
+                  <input *ngIf="!filter.range || filter.range.indexOf(item.operation) === -1" type="text" class="form-control" [(ngModel)]="item.value" />
+
+                  <ng-template [ngIf]="filter.range && filter.range.indexOf(item.operation) !== -1">
+                    <input type="text" class="form-control" [(ngModel)]="item.from" />
+                    <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
+                    <input type="text" class="form-control" [(ngModel)]="item.to" />
+                  </ng-template>
+
+                </div>
+
+              </div>
+
+              <div *ngSwitchCase="'date'">
+
+                <div *ngIf="filter.operation.length == 0">
+
+                  <input *ngIf="!filter.range" type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.value" />
+
+                  <div *ngIf="filter.range" class="input-group">
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.from" />
+                    <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.to" />
+                  </div>
+
+                </div>
+
+                <div *ngIf="filter.operation.length > 0" class="input-group">
+
+                  <div class="input-group-prepend">
+                    <select class="form-control" [(ngModel)]="item.operation">
+                      <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
+                    </select>
+                  </div>
+
+                  <input *ngIf="!filter.range || filter.range.indexOf(item.operation) === -1" type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.value" />
+
+                  <ng-template [ngIf]="filter.range && filter.range.indexOf(item.operation) !== -1">
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.from" />
+                    <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.to" />
+                  </ng-template>
+
+                </div>
+
+              </div>
+
+              <div *ngSwitchCase="'select'">
+
+                <div *ngIf="!filter.multi">
+
+                  <select *ngIf="filter.operation.length == 0" class="form-control" placeholder="(Select...)" [(ngModel)]="item.value">
+                    <option *ngFor="let data of filter.items" [value]="data.id">{{data.title}}</option>
+                  </select>
+
+                  <div *ngIf="filter.operation.length > 0" class="input-group">
+                    <div class="input-group-prepend">
+                      <select class="form-control" [(ngModel)]="item.operation">
+                        <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
+                      </select>
+                    </div>
+                    <select class="form-control" placeholder="(Select...)" [(ngModel)]="item.value">
+                      <option *ngFor="let data of filter.items" [value]="data.id">{{data.title}}</option>
+                    </select>
+                  </div>
+
+                </div>
+
+                <div *ngIf="filter.multi">
+
+                  <ng-select *ngIf="filter.operation.length === 0" [multiple]="true" [clearable]="false" [searchable]="false" [closeOnSelect]="false" bindLabel="title" bindValue="id" [items]="filter.items" class="ngx-select" placeholder="(Select...)" [(ngModel)]="item.value">
+
+                    <ng-template ng-option-tmp let-data="item" let-index="index">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox">
+                        <label class="form-check-label">
+                          {{data.title}}
+                        </label>
+                      </div>
+                    </ng-template>
+
+                  </ng-select>
+
+                  <div *ngIf="filter.operation.length > 0" class="input-group">
+                    <div class="input-group-prepend">
+                      <select class="form-control" [(ngModel)]="item.operation">
+                        <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
+                      </select>
+                    </div>
+                    <ng-select [multiple]="true" [clearable]="false" [searchable]="false" [closeOnSelect]="false" bindLabel="title" bindValue="id" [items]="filter.items" class="ngx-select" placeholder="(Select...)" [(ngModel)]="item.value">
+
+                      <ng-template ng-option-tmp let-data="item" let-index="index">
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox">
+                          <label class="form-check-label">
+                            {{data.title}}
+                          </label>
+                        </div>
+                      </ng-template>
+
+                    </ng-select>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <hr />
+      </div>
+    </div>
+
+    <div class="row">
+
+      <div class="col-3">
+        <button type="button" class="btn btn-primary" (click)="addFilter()">Add Filter</button>
+      </div>
+
+      <div class="col-9 float-right text-right">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="match-criteria" value="all" [(ngModel)]="request.match"> Match all
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="match-criteria" value="any" [(ngModel)]="request.match"> Match any
+          </label>
+        </div>
+        <button type="button" class="btn btn-primary" (click)="getData()">Apply Filters</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="ngx-table-container">
+
+        <table [ngClass]="['table', table.class]">
+          <thead>
+            <tr>
+              <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
+                <th>
+                  {{column.title}}&nbsp;
+                  <a *ngIf="column.sort" href="#" (click)="sort(column.id)">
+                    <i class="fa fa-sort" *ngIf="request.sort !== column.id || request.order === 0"></i>
+                    <i class="fa fa-caret-down" *ngIf="request.sort === column.id && request.order === -1"></i>
+                    <i class="fa fa-caret-up" *ngIf="request.sort === column.id && request.order === 1"></i>
+                  </a>
+                </th>
+              </ng-template>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-template *ngIf="!loading" ngFor let-row [ngForOf]="data">
+              <tr>
+                <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
+                  <td>{{row[column.id]}}</td>
+                </ng-template>
+              </tr>
+            </ng-template>
+            <tr *ngIf="loading">
+              <td [colSpan]="table.projectedColumns().length">
+                <h2 class="text-center m-5">Loading...</h2>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="table.options.pagination && table.pagination.total !== -1" class="row">
+
+    <div class="col-4 text-left">
+      <label class="my-1">Showing {{table.pagination.start}} - {{table.pagination.end}} of {{table.pagination.total}} record(s)</label>
+    </div>
+
+    <div class="col-4">
+      <div class="form-inline justify-content-center">
+
+        <select class="form-control" [disabled]="loading" [(ngModel)]="request.records" (change)="records()">
+          <option *ngFor="let record of table.pagination.records" [value]="record">{{record}}</option>
+        </select>
+        <label class="my-1 ml-2"> record(s) per page</label>
+      </div>
+    </div>
+
+    <div class="col-4 pull-right">
+      <pagination [disabled]="loading" [boundaryLinks]="true" [totalItems]="table.pagination.total" [rotate]="true" [maxSize]="5" [itemsPerPage]="request.records" (pageChanged)="page($event)" [(ngModel)]="request.page" class="justify-content-end"></pagination>
+    </div>
+  </div>
+
+</div>

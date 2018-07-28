@@ -1,8 +1,29 @@
 {
   "name": "ngx-tableview",
-  "version": "0.0.1",
+  "version": "1.0.0-beta.0",
+  "description": "Simple yet Elegant Table Viewer",
+  "keywords": ["table", "datatable", "tableview", "angular", "bootstrap"],
+  "homepage": "https://github.com/abstract-labs/ngx-tableview#readme",
+  "bugs": {
+    "url": "https://github.com/abstract-labs/ngx-tableview/issues",
+    "email": "er.rohitaggarwal1989@gmail.com"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Rohit Aggarwal",
+    "email": "er.rohitaggarwal1989@gmail.com",
+    "url": "http://rohit-aggarwal.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abstract-labs/ngx-tableview"
+  },
   "peerDependencies": {
     "@angular/common": "^6.0.0-rc.0 || ^6.0.0",
-    "@angular/core": "^6.0.0-rc.0 || ^6.0.0"
+    "@angular/core": "^6.0.0-rc.0 || ^6.0.0",
+    "bootstrap": "^4.1.1",
+    "ngx-bootstrap": "^3.0.0",
+    "@ng-select/ng-select": "^2.3.5",
+    "font-awesome": "^4.7.0"
   }
 }
