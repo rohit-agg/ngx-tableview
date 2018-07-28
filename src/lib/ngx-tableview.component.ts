@@ -23,6 +23,7 @@ export class NgxTableviewComponent implements OnInit {
 
   filtersCollapsed: Boolean = true;
   loading: Boolean = false;
+  searchText: string;
 
   bsConfig = {
     showWeekNumbers: false,
