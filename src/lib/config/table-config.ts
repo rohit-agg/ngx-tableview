@@ -46,7 +46,7 @@ export class TableConfig {
   }
 
   showHeader() {
-    return this.title || this.options.headerEnabled() || this.filters;
+    return this.title || this.options.headerEnabled() || this.filters.size > 0;
   }
 
   isProjected(column) {

@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid mb-5">
 
   <div class="row" *ngIf="table.showHeader()">
     <div class="col-12">
@@ -7,7 +7,7 @@
 
       <div class="btn-group pull-right" role="group">
 
-        <button type="button" *ngIf="table.options.refresh" class="btn btn-outline-dark">
+        <button type="button" *ngIf="table.options.refresh" class="btn btn-outline-dark" [disabled]="loading" (click)="getData()">
           <i class="fa fa-refresh"></i> Refresh
         </button>
 
@@ -27,9 +27,9 @@
                 </div>
 
                 <div role="menuitem" class="mt-1 mb-1">
-                  <button type="button" class="btn btn-link p-0">Show All</button>
+                  <button type="button" class="btn btn-link p-0" (click)="showAll()">Show All</button>
                   <label class="m-0">&nbsp;|&nbsp;</label>
-                  <button type="button" class="btn btn-link p-0">Hide All</button>
+                  <button type="button" class="btn btn-link p-0" (click)="hideAll()">Hide All</button>
                 </div>
 
                 <hr class="divider mt-0 mb-2" />
@@ -66,7 +66,7 @@
   <div *ngIf="table.filters.size > 0" class="card card-block card-header" [collapse]="filtersCollapsed" id="filtersCollapse">
 
     <div class="row">
-      <div class="col-4" *ngFor="let item of filters">
+      <div class="col-4" *ngFor="let item of request.filters; index as i">
 
         <div class="form-group">
           <div class="row">
@@ -74,11 +74,11 @@
             <div class="col-4">
               <div class="input-group">
                 <div class="input-group-prepend">
-                  <button class="btn" type="button">
+                  <button class="btn" type="button" (click)="removeFilter(i)">
                     <i class="fa fa-minus"></i>
                   </button>
                 </div>
-                <select class="form-control" [(ngModel)]="item.id">
+                <select class="form-control" [(ngModel)]="item.id" placeholder="(Select...)">
                   <option *ngFor="let filter of table.filters | toArray" [value]="filter.id">{{filter.title}}</option>
                 </select>
               </div>
@@ -91,12 +91,12 @@
 
                 <div *ngIf="filter.operation.length == 0">
 
-                  <input *ngIf="!filter.range" type="text" class="form-control" />
+                  <input *ngIf="!filter.range" type="text" class="form-control" [(ngModel)]="item.value" />
 
                   <div *ngIf="filter.range" class="input-group">
-                    <input type="text" class="form-control" />
+                    <input type="text" class="form-control" [(ngModel)]="item.from" />
                     <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
-                    <input type="text" class="form-control" />
+                    <input type="text" class="form-control" [(ngModel)]="item.to" />
                   </div>
 
                 </div>
@@ -104,17 +104,17 @@
                 <div *ngIf="filter.operation.length > 0" class="input-group">
 
                   <div class="input-group-prepend">
-                    <select class="form-control">
+                    <select class="form-control" [(ngModel)]="item.operation">
                       <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
                     </select>
                   </div>
 
-                  <input *ngIf="!filter.range || filter.range.indexOf('LIKE1') === -1" type="text" class="form-control" />
+                  <input *ngIf="!filter.range || filter.range.indexOf(item.operation) === -1" type="text" class="form-control" [(ngModel)]="item.value" />
 
-                  <ng-template [ngIf]="filter.range && filter.range.indexOf('LIKE1') !== -1">
-                    <input type="text" class="form-control" />
+                  <ng-template [ngIf]="filter.range && filter.range.indexOf(item.operation) !== -1">
+                    <input type="text" class="form-control" [(ngModel)]="item.from" />
                     <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
-                    <input type="text" class="form-control" />
+                    <input type="text" class="form-control" [(ngModel)]="item.to" />
                   </ng-template>
 
                 </div>
@@ -125,12 +125,12 @@
 
                 <div *ngIf="filter.operation.length == 0">
 
-                  <input *ngIf="!filter.range" type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+                  <input *ngIf="!filter.range" type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.value" />
 
                   <div *ngIf="filter.range" class="input-group">
-                    <input type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.from" />
                     <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
-                    <input type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.to" />
                   </div>
 
                 </div>
@@ -138,19 +138,18 @@
                 <div *ngIf="filter.operation.length > 0" class="input-group">
 
                   <div class="input-group-prepend">
-                    <select class="form-control">
+                    <select class="form-control" [(ngModel)]="item.operation">
                       <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
                     </select>
                   </div>
 
-                  <input *ngIf="!filter.range || filter.range.indexOf('LIKE1') === -1" type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+                  <input *ngIf="!filter.range || filter.range.indexOf(item.operation) === -1" type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.value" />
 
-                  <ng-template [ngIf]="filter.range && filter.range.indexOf('LIKE1') !== -1">
-                    <input type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+                  <ng-template [ngIf]="filter.range && filter.range.indexOf(item.operation) !== -1">
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.from" />
                     <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
-                    <input type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="item.to" />
                   </ng-template>
-
 
                 </div>
 
@@ -160,17 +159,17 @@
 
                 <div *ngIf="!filter.multi">
 
-                  <select *ngIf="filter.operation.length == 0" class="form-control">
+                  <select *ngIf="filter.operation.length == 0" class="form-control" placeholder="(Select...)" [(ngModel)]="item.value">
                     <option *ngFor="let data of filter.items" [value]="data.id">{{data.title}}</option>
                   </select>
 
                   <div *ngIf="filter.operation.length > 0" class="input-group">
                     <div class="input-group-prepend">
-                      <select class="form-control">
+                      <select class="form-control" [(ngModel)]="item.operation">
                         <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
                       </select>
                     </div>
-                    <select class="form-control">
+                    <select class="form-control" placeholder="(Select...)" [(ngModel)]="item.value">
                       <option *ngFor="let data of filter.items" [value]="data.id">{{data.title}}</option>
                     </select>
                   </div>
@@ -179,7 +178,7 @@
 
                 <div *ngIf="filter.multi">
 
-                  <ng-select *ngIf="filter.operation.length === 0" [multiple]="true" [clearable]="false" [searchable]="false" [closeOnSelect]="false" bindLabel="title" bindValue="id" [items]="filter.items" class="ngx-select">
+                  <ng-select *ngIf="filter.operation.length === 0" [multiple]="true" [clearable]="false" [searchable]="false" [closeOnSelect]="false" bindLabel="title" bindValue="id" [items]="filter.items" class="ngx-select" placeholder="(Select...)" [(ngModel)]="item.value">
 
                     <ng-template ng-option-tmp let-data="item" let-index="index">
                       <div class="form-check form-check-inline">
@@ -194,12 +193,11 @@
 
                   <div *ngIf="filter.operation.length > 0" class="input-group">
                     <div class="input-group-prepend">
-                      <select class="form-control">
+                      <select class="form-control" [(ngModel)]="item.operation">
                         <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
                       </select>
                     </div>
-                    <ng-select [multiple]="true" [clearable]="false" [searchable]="false" [closeOnSelect]="false" bindLabel="title" bindValue="id" [items]="filter.items"
-                      class="ngx-select">
+                    <ng-select [multiple]="true" [clearable]="false" [searchable]="false" [closeOnSelect]="false" bindLabel="title" bindValue="id" [items]="filter.items" class="ngx-select" placeholder="(Select...)" [(ngModel)]="item.value">
 
                       <ng-template ng-option-tmp let-data="item" let-index="index">
                         <div class="form-check form-check-inline">
@@ -234,21 +232,21 @@
     <div class="row">
 
       <div class="col-3">
-        <button type="button" class="btn btn-primary">Add Filter</button>
+        <button type="button" class="btn btn-primary" (click)="addFilter()">Add Filter</button>
       </div>
 
       <div class="col-9 float-right text-right">
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="match-criteria" value="all" checked> Match all
+            <input class="form-check-input" type="radio" name="match-criteria" value="all" [(ngModel)]="request.match"> Match all
           </label>
         </div>
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="match-criteria" value="any"> Match any
+            <input class="form-check-input" type="radio" name="match-criteria" value="any" [(ngModel)]="request.match"> Match any
           </label>
         </div>
-        <button type="button" class="btn btn-primary">Apply Filters</button>
+        <button type="button" class="btn btn-primary" (click)="getData()">Apply Filters</button>
       </div>
 
     </div>
@@ -265,7 +263,11 @@
               <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
                 <th>
                   {{column.title}}&nbsp;
-                  <a *ngIf="column.sort" href="#"><i class="fa fa-sort"></i></a>
+                  <a *ngIf="column.sort" href="#" (click)="sort(column.id)">
+                    <i class="fa fa-sort" *ngIf="request.sort !== column.id || request.order === 0"></i>
+                    <i class="fa fa-caret-down" *ngIf="request.sort === column.id && request.order === -1"></i>
+                    <i class="fa fa-caret-up" *ngIf="request.sort === column.id && request.order === 1"></i>
+                  </a>
                 </th>
               </ng-template>
             </tr>
@@ -290,7 +292,7 @@
     </div>
   </div>
 
-  <div *ngIf="table.options.pagination && table.pagination.total !== -1 && !loading" class="row">
+  <div *ngIf="table.options.pagination && table.pagination.total !== -1" class="row">
 
     <div class="col-4 text-left">
       <label class="my-1">Showing {{table.pagination.start}} - {{table.pagination.end}} of {{table.pagination.total}} record(s)</label>
@@ -299,7 +301,7 @@
     <div class="col-4">
       <div class="form-inline justify-content-center">
 
-        <select class="form-control">
+        <select class="form-control" [disabled]="loading" [(ngModel)]="request.records" (change)="records()">
           <option *ngFor="let record of table.pagination.records" [value]="record">{{record}}</option>
         </select>
         <label class="my-1 ml-2"> record(s) per page</label>
@@ -307,7 +309,7 @@
     </div>
 
     <div class="col-4 pull-right">
-      <pagination [boundaryLinks]="true" [totalItems]="" [rotate]="true" [maxSize]="5" class="justify-content-end"></pagination>
+      <pagination [disabled]="loading" [boundaryLinks]="true" [totalItems]="table.pagination.total" [rotate]="true" [maxSize]="5" [itemsPerPage]="request.records" (pageChanged)="page($event)" [(ngModel)]="request.page" class="justify-content-end"></pagination>
     </div>
   </div>
 

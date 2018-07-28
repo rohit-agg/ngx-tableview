@@ -25,6 +25,11 @@ export class Filter {
     const self = this;
 
     if (filter.items) {
+
+      if (!filter.multi) {
+        this.items.push(new IdTitle('', '(Select...)'));
+      }
+
       for (const value in filter.items) {
         if (filter.items.hasOwnProperty(value)) {
           self.items.push(new IdTitle(value, filter.items[value]));

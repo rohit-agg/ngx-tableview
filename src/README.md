@@ -18,7 +18,8 @@
     default: <boolean>,
     items: <Map<string, string>>,
     operation: <Map<string, string>>,
-    multi: <boolean>
+    multi: <boolean>,
+    range: <boolean|array>
   }],
   columns: [{
     id: <string>,
