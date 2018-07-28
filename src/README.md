@@ -24,6 +24,7 @@
     id: <string>,
     title: <string>,
     class: <string>,
+    sort: <boolean>,
     default: <boolean>
   }],
   projection: [<string>]

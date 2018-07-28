@@ -25,7 +25,14 @@
                 <div role="menuitem">
                   <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchText" />
                 </div>
-                <hr class="divider" />
+
+                <div role="menuitem" class="mt-1 mb-1">
+                  <button type="button" class="btn btn-link p-0">Show All</button>
+                  <label class="m-0">&nbsp;|&nbsp;</label>
+                  <button type="button" class="btn btn-link p-0">Hide All</button>
+                </div>
+
+                <hr class="divider mt-0 mb-2" />
 
                 <ul class="list-unstyled dropdown-list" role="menuitem">
 
@@ -256,12 +263,15 @@
           <thead>
             <tr>
               <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
-                <th>{{column.title}}</th>
+                <th>
+                  {{column.title}}&nbsp;
+                  <a *ngIf="column.sort" href="#"><i class="fa fa-sort"></i></a>
+                </th>
               </ng-template>
             </tr>
           </thead>
           <tbody>
-            <ng-template [ngIf]="!loading" ngFor let-row [ngForOf]="data">
+            <ng-template *ngIf="!loading" ngFor let-row [ngForOf]="data">
               <tr>
                 <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
                   <td>{{row[column.id]}}</td>
@@ -283,7 +293,7 @@
   <div *ngIf="table.options.pagination && table.pagination.total !== -1 && !loading" class="row">
 
     <div class="col-4 text-left">
-      <label class="my-1">Record(s) {{table.pagination.start}} - {{table.pagination.end}} of {{table.pagination.total}}</label>
+      <label class="my-1">Showing {{table.pagination.start}} - {{table.pagination.end}} of {{table.pagination.total}} record(s)</label>
     </div>
 
     <div class="col-4">
