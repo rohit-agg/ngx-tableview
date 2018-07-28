@@ -47,7 +47,7 @@
 
         </div>
 
-        <button type="button" *ngIf="table.filters" class="btn btn-outline-dark" (click)="filtersCollapsed = !filtersCollapsed" [attr.aria-expanded]="!filtersCollapsed" aria-controls="filtersCollapse">
+        <button type="button" *ngIf="table.filters.size > 0" class="btn btn-outline-dark" (click)="filtersCollapsed = !filtersCollapsed" [attr.aria-expanded]="!filtersCollapsed" aria-controls="filtersCollapse">
           <i class="fa fa-filter"></i> Filter
         </button>
 
@@ -56,13 +56,165 @@
     </div>
   </div>
 
-  <div *ngIf="table.filters" class="card card-block card-header" [collapse]="filtersCollapsed" id="filtersCollapse">
+  <div *ngIf="table.filters.size > 0" class="card card-block card-header" [collapse]="filtersCollapsed" id="filtersCollapse">
 
     <div class="row">
-      <div class="col-3" *ngFor="let filter of filters">
+      <div class="col-4" *ngFor="let item of filters">
+
         <div class="form-group">
-          <ngx-tableview-filter [filters]="table.filters" [(ngModel)]="filter"></ngx-tableview-filter>
+          <div class="row">
+
+            <div class="col-4">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <button class="btn" type="button">
+                    <i class="fa fa-minus"></i>
+                  </button>
+                </div>
+                <select class="form-control" [(ngModel)]="item.id">
+                  <option *ngFor="let filter of table.filters | toArray" [value]="filter.id">{{filter.title}}</option>
+                </select>
+              </div>
+
+            </div>
+
+            <div class="col-8" *ngIf="table.filters.get(item.id); let filter" [ngSwitch]="filter.type">
+
+              <div *ngSwitchCase="'text'">
+
+                <div *ngIf="filter.operation.length == 0">
+
+                  <input *ngIf="!filter.range" type="text" class="form-control" />
+
+                  <div *ngIf="filter.range" class="input-group">
+                    <input type="text" class="form-control" />
+                    <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
+                    <input type="text" class="form-control" />
+                  </div>
+
+                </div>
+
+                <div *ngIf="filter.operation.length > 0" class="input-group">
+
+                  <div class="input-group-prepend">
+                    <select class="form-control">
+                      <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
+                    </select>
+                  </div>
+
+                  <input *ngIf="!filter.range || filter.range.indexOf('LIKE1') === -1" type="text" class="form-control" />
+
+                  <ng-template [ngIf]="filter.range && filter.range.indexOf('LIKE1') !== -1">
+                    <input type="text" class="form-control" />
+                    <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
+                    <input type="text" class="form-control" />
+                  </ng-template>
+
+                </div>
+
+              </div>
+
+              <div *ngSwitchCase="'date'">
+
+                <div *ngIf="filter.operation.length == 0">
+
+                  <input *ngIf="!filter.range" type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+
+                  <div *ngIf="filter.range" class="input-group">
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+                    <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+                  </div>
+
+                </div>
+
+                <div *ngIf="filter.operation.length > 0" class="input-group">
+
+                  <div class="input-group-prepend">
+                    <select class="form-control">
+                      <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
+                    </select>
+                  </div>
+
+                  <input *ngIf="!filter.range || filter.range.indexOf('LIKE1') === -1" type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+
+                  <ng-template [ngIf]="filter.range && filter.range.indexOf('LIKE1') !== -1">
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+                    <label class="input-group-text rounded-0 border-left-0 border-right-0">to</label>
+                    <input type="text" class="form-control" bsDatepicker [bsConfig]="config" />
+                  </ng-template>
+
+
+                </div>
+
+              </div>
+
+              <div *ngSwitchCase="'select'">
+
+                <div *ngIf="!filter.multi">
+
+                  <select *ngIf="filter.operation.length == 0" class="form-control">
+                    <option *ngFor="let data of filter.items" [value]="data.id">{{data.title}}</option>
+                  </select>
+
+                  <div *ngIf="filter.operation.length > 0" class="input-group">
+                    <div class="input-group-prepend">
+                      <select class="form-control">
+                        <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
+                      </select>
+                    </div>
+                    <select class="form-control">
+                      <option *ngFor="let data of filter.items" [value]="data.id">{{data.title}}</option>
+                    </select>
+                  </div>
+
+                </div>
+
+                <div *ngIf="filter.multi">
+
+                  <ng-select *ngIf="filter.operation.length === 0" [multiple]="true" [clearable]="false" [searchable]="false" [closeOnSelect]="false" bindLabel="title" bindValue="id" [items]="filter.items" class="ngx-select">
+
+                    <ng-template ng-option-tmp let-data="item" let-index="index">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox">
+                        <label class="form-check-label">
+                          {{data.title}}
+                        </label>
+                      </div>
+                    </ng-template>
+
+                  </ng-select>
+
+                  <div *ngIf="filter.operation.length > 0" class="input-group">
+                    <div class="input-group-prepend">
+                      <select class="form-control">
+                        <option *ngFor="let op of filter.operation" [value]="op.id">{{op.title}}</option>
+                      </select>
+                    </div>
+                    <ng-select [multiple]="true" [clearable]="false" [searchable]="false" [closeOnSelect]="false" bindLabel="title" bindValue="id" [items]="filter.items"
+                      class="ngx-select">
+
+                      <ng-template ng-option-tmp let-data="item" let-index="index">
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox">
+                          <label class="form-check-label">
+                            {{data.title}}
+                          </label>
+                        </div>
+                      </ng-template>
+
+                    </ng-select>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
         </div>
+
       </div>
     </div>
 
@@ -109,7 +261,7 @@
             </tr>
           </thead>
           <tbody>
-            <ng-template *ngIf="!loading" ngFor let-row [ngForOf]="data">
+            <ng-template [ngIf]="!loading" ngFor let-row [ngForOf]="data">
               <tr>
                 <ng-template ngFor let-column [ngForOf]="table.projectedColumns()">
                   <td>{{row[column.id]}}</td>

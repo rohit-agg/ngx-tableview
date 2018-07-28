@@ -17,7 +17,8 @@
     type: <string>,
     default: <boolean>,
     items: <Map<string, string>>,
-    operation: <Map<string, string>>
+    operation: <Map<string, string>>,
+    multi: <boolean>
   }],
   columns: [{
     id: <string>,

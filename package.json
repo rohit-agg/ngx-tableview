@@ -1,6 +1,6 @@
 {
   "name": "ngx-tableview",
-  "version": "0.1.0",
+  "version": "1.0.0-beta.0",
   "description": "Simple yet Elegant Table Viewer",
   "keywords": ["table", "datatable", "tableview", "angular", "bootstrap"],
   "homepage": "https://github.com/abstract-labs/ngx-tableview#readme",
@@ -23,6 +23,7 @@
     "@angular/core": "^6.0.0-rc.0 || ^6.0.0",
     "bootstrap": "^4.1.1",
     "ngx-bootstrap": "^3.0.0",
+    "@ng-select/ng-select": "^2.3.5",
     "font-awesome": "^4.7.0"
   }
 }

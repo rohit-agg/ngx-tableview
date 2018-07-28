@@ -30,3 +30,25 @@
 ul.pagination {
   margin-bottom: 0;
 }
+
+.ngx-select.ng-select .ng-select-container {
+  min-height: 38px;
+}
+
+.ngx-select.ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.ngx-select.ng-select .ng-select-container .ng-value-container .ng-input>input[readonly] {
+  display: none;
+}
+
+.input-group .ngx-select.ng-select {
+  flex: 1 1 auto;
+}
+
+.input-group .ngx-select.ng-select .ng-select-container {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}

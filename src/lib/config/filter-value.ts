@@ -1,5 +1,3 @@
-import { Operation } from './operation';
-
 export class FilterValue {
 
   id?: string;

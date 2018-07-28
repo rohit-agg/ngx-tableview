@@ -1,14 +1,15 @@
-import { Item } from './item';
-import { Operation } from './operation';
+import { IdTitle } from './id-title';
 
 export class Filter {
 
   id: string;
   title: string;
   type: string;
-  items: Array<Item>;
+  items: Array<IdTitle>;
   default: boolean;
-  operation: Array<Operation>;
+  multi: boolean;
+  range: boolean | Array<String>;
+  operation: Array<IdTitle>;
 
   constructor(filter) {
 
@@ -16,16 +17,17 @@ export class Filter {
     this.title = filter.title;
     this.type = filter.type;
     this.default = filter.default !== undefined ? filter.default : false;
+    this.multi = filter.multi !== undefined ? filter.multi : false;
+    this.range = filter.range !== undefined ? filter.range : false;
     this.items = [];
     this.operation = [];
 
     const self = this;
 
     if (filter.items) {
-      self.items.push(new Item(-1, '(Select...)'));
       for (const value in filter.items) {
         if (filter.items.hasOwnProperty(value)) {
-          self.items.push(new Item(value, filter.items[value]));
+          self.items.push(new IdTitle(value, filter.items[value]));
         }
       }
     }
@@ -33,7 +35,7 @@ export class Filter {
     if (filter.operation) {
       for (const value in filter.operation) {
         if (filter.operation.hasOwnProperty(value)) {
-          self.operation.push(new Operation(value, filter.operation[value]));
+          self.operation.push(new IdTitle(value, filter.operation[value]));
         }
       }
     }

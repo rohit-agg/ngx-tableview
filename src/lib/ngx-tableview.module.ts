@@ -2,14 +2,12 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CollapseModule, PaginationModule, BsDropdownModule, BsDatepickerModule } from 'ngx-bootstrap';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { ColumnFilterPipe } from './pipes/column-filter.pipe';
+import { ToArrayPipe } from './pipes/to-array.pipe';
 
 import { NgxTableviewComponent } from './ngx-tableview.component';
-import { NgxTableviewFilterTextComponent } from './filters/ngx-tableview-filter-text.component';
-import { NgxTableviewFilterDateComponent } from './filters/ngx-tableview-filter-date.component';
-import { NgxTableviewFilterSelectComponent } from './filters/ngx-tableview-filter-select.component';
-import { NgxTableviewFilterComponent } from './filters/ngx-tableview-filter.component';
 
 @NgModule({
   imports: [
@@ -18,15 +16,13 @@ import { NgxTableviewFilterComponent } from './filters/ngx-tableview-filter.comp
     CollapseModule.forRoot(),
     PaginationModule.forRoot(),
     BsDropdownModule.forRoot(),
-    BsDatepickerModule.forRoot()
+    BsDatepickerModule.forRoot(),
+    NgSelectModule
   ],
   declarations: [
     ColumnFilterPipe,
-    NgxTableviewComponent,
-    NgxTableviewFilterComponent,
-    NgxTableviewFilterTextComponent,
-    NgxTableviewFilterDateComponent,
-    NgxTableviewFilterSelectComponent,
+    ToArrayPipe,
+    NgxTableviewComponent
   ],
   exports: [NgxTableviewComponent]
 })

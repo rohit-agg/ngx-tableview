@@ -7,7 +7,8 @@ import { FilterValue } from './config/filter-value';
   templateUrl: 'ngx-tableview.component.html',
   styleUrls: [
     'ngx-tableview.component.css',
-    '../../../../node_modules/ngx-bootstrap/datepicker/bs-datepicker.css'
+    '../../../../node_modules/ngx-bootstrap/datepicker/bs-datepicker.css',
+    '../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'
   ],
   encapsulation: ViewEncapsulation.None
 })
@@ -34,17 +35,17 @@ export class NgxTableviewComponent implements OnInit {
 
   private __prepareDefaultFilters() {
 
-    this.filters = this.table.filters.map(function (filter) {
+    const self = this;
+    this.filters = [];
+
+    this.table.filters.forEach(filter => {
 
       if (filter.default === true) {
 
         const filterValue = new FilterValue();
         filterValue.id = filter.id;
-        return filterValue;
+        self.filters.push(filterValue);
       }
-
-    }).filter(function (value) {
-      return value;
     });
   }
 

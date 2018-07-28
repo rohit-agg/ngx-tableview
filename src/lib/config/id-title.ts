@@ -1,4 +1,4 @@
-export class Operation {
+export class IdTitle {
 
   id: string;
   title: string;

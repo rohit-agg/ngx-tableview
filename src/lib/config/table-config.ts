@@ -10,7 +10,7 @@ export class TableConfig {
 
   options: TableOptions;
 
-  filters: Array<Filter>;
+  filters: Map<string, Filter>;
   columns: Array<Column>;
   projection: Array<string>;
   pagination: Pagination;
@@ -25,7 +25,7 @@ export class TableConfig {
     this.options = new TableOptions(config.options);
 
     this.columns = new Array<Column>();
-    this.filters = new Array<Filter>();
+    this.filters = new Map<string, Filter>();
     this.projection = config.projection ? config.projection : [];
     this.pagination = new Pagination(config.pagination);
 
@@ -41,7 +41,7 @@ export class TableConfig {
     config.filters.forEach(function (filter) {
 
       const ngxFilter = new Filter(filter);
-      self.filters.push(ngxFilter);
+      self.filters.set(filter.id, ngxFilter);
     });
   }
 
